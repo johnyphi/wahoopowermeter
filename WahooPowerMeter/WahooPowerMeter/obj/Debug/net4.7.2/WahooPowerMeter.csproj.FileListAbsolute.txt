@@ -1,0 +1,14 @@
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\obj\Debug\net4.7.2\WahooPowerMeter.csproj.AssemblyReference.cache
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\obj\Debug\net4.7.2\WahooPowerMeter.csproj.SuggestedBindingRedirects.cache
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\obj\Debug\net4.7.2\WahooPowerMeter.exe.config
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\obj\Debug\net4.7.2\WahooPowerMeter.GeneratedMSBuildEditorConfig.editorconfig
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\obj\Debug\net4.7.2\WahooPowerMeter.AssemblyInfoInputs.cache
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\obj\Debug\net4.7.2\WahooPowerMeter.AssemblyInfo.cs
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\obj\Debug\net4.7.2\WahooPowerMeter.csproj.CoreCompileInputs.cache
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\bin\Debug\net4.7.2\WahooPowerMeter.exe.config
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\bin\Debug\net4.7.2\WahooPowerMeter.exe
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\bin\Debug\net4.7.2\WahooPowerMeter.pdb
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\bin\Debug\net4.7.2\InTheHand.BluetoothLE.dll
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\obj\Debug\net4.7.2\WahooPow.CDFE3943.Up2Date
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\obj\Debug\net4.7.2\WahooPowerMeter.exe
+F:\localbuild\WahooPowerMeter\WahooPowerMeter\WahooPowerMeter\obj\Debug\net4.7.2\WahooPowerMeter.pdb

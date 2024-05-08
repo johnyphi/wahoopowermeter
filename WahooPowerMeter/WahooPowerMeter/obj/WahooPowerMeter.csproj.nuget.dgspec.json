@@ -1,0 +1,68 @@
+{
+  "format": 1,
+  "restore": {
+    "F:\\localbuild\\WahooPowerMeter\\WahooPowerMeter\\WahooPowerMeter\\WahooPowerMeter.csproj": {}
+  },
+  "projects": {
+    "F:\\localbuild\\WahooPowerMeter\\WahooPowerMeter\\WahooPowerMeter\\WahooPowerMeter.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "F:\\localbuild\\WahooPowerMeter\\WahooPowerMeter\\WahooPowerMeter\\WahooPowerMeter.csproj",
+        "projectName": "WahooPowerMeter",
+        "projectPath": "F:\\localbuild\\WahooPowerMeter\\WahooPowerMeter\\WahooPowerMeter\\WahooPowerMeter.csproj",
+        "packagesPath": "C:\\Users\\jphilli\\.nuget\\packages\\",
+        "outputPath": "F:\\localbuild\\WahooPowerMeter\\WahooPowerMeter\\WahooPowerMeter\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\jphilli\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net4.7.2"
+        ],
+        "sources": {
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net472": {
+            "targetAlias": "net4.7.2",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        }
+      },
+      "frameworks": {
+        "net472": {
+          "targetAlias": "net4.7.2",
+          "dependencies": {
+            "InTheHand.BluetoothLE": {
+              "target": "Package",
+              "version": "[4.0.36, )"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204\\RuntimeIdentifierGraph.json"
+        }
+      },
+      "runtimes": {
+        "win7-x86": {
+          "#import": []
+        }
+      }
+    }
+  }
+}
