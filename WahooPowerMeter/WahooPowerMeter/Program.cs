@@ -11,7 +11,7 @@ namespace WahooPowerMeter
         private static ISpeedSensorService speedSensorService = new SpeedSensorService();
         private static IPowerMeterService powerMeterService = new PowerMeterService();
 
-        static string speechKey = "ad459262d8ec4047b6cb05084d89877d";
+        static string speechKey = "";
         static string speechRegion = "uksouth";
 
         static SpeechSynthesizer speechSynthesizer;
