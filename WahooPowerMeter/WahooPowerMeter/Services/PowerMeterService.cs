@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Threading.Tasks;
 using WahooPowerMeter.Models;
 using Windows.Devices.Bluetooth;
@@ -16,15 +17,22 @@ namespace WahooPowerMeter.Services
         public UnitOfMeasurement Unit { get; } = UnitOfMeasurement.Watts;
         public int Value => PowerInWatts;
 
+        private readonly ILogger<PowerMeterService> Logger;
+
+        public PowerMeterService(ILogger<PowerMeterService> logger)
+        {
+            Logger = logger;
+        }
+
         public async Task StartAsync()
         {
-            Console.WriteLine("Starting power meter service...");
+            Logger.LogInformation("Starting power meter service...");
 
             var adapter = await BluetoothAdapter.GetDefaultAsync();
 
             if (adapter == null)
             {
-                Console.WriteLine("Bluetooth is not available on this device.");
+                Logger.LogInformation("Bluetooth is not available on this device.");
                 return;
             }
 
@@ -33,7 +41,7 @@ namespace WahooPowerMeter.Services
             
             if (result.Error != BluetoothError.Success)
             {
-                Console.WriteLine("Error creating GATT service provider.");
+                Logger.LogError("Error creating GATT service provider.");
                 return;
             }
 
@@ -60,7 +68,7 @@ namespace WahooPowerMeter.Services
             };
 
             serviceProvider.StartAdvertising(advParameters);
-            Console.WriteLine("Power meter service started.");
+            Logger.LogInformation("Power meter service started.");
         }
 
         public async Task UpdateAsync(float speedInKmH)

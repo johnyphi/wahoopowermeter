@@ -1,15 +1,23 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using WahooPowerMeter.Models;
 
 namespace WahooPowerMeter.Processors
 {
     public class CSCPacketProcessor : IPacketProcessor
     {
+        private readonly ILogger<CSCPacketProcessor> Logger;
+
+        public CSCPacketProcessor(ILogger<CSCPacketProcessor> logger)
+        {
+            Logger = logger;
+        }
+
         public CSCPacket Process(byte[] data)
         {
             if (data.Length == 0)
             {
-                Console.WriteLine("Empty packet = no data");
+                Logger.LogDebug("Empty packet = no data");
                 return null;
             }
 
@@ -28,7 +36,7 @@ namespace WahooPowerMeter.Processors
 
                 if (data.Length - dataIndex < dataBytesExpected)
                 {
-                    Console.WriteLine("Error: Missing data in packet.");
+                    Logger.LogDebug("Error: Missing data in packet.");
                     return null;
                 }
 
@@ -50,7 +58,7 @@ namespace WahooPowerMeter.Processors
 
                 if (data.Length - dataIndex < dataBytesExpected)
                 {
-                    Console.WriteLine("Error: Missing data in packet.");
+                    Logger.LogDebug("Error: Missing data in packet.");
                     return null;
                 }
 
@@ -70,11 +78,11 @@ namespace WahooPowerMeter.Processors
             return null;
         }
 
-        private static int GetIntFromWithinByteArray(byte[] data, int index)
+        private int GetIntFromWithinByteArray(byte[] data, int index)
         {
             if (data.Length < index + 4)
             {
-                Console.WriteLine("Error: Insufficient bytes in the array.");
+                Logger.LogDebug("Error: Insufficient bytes in the array.");
                 return 0;
             }
 
@@ -83,11 +91,11 @@ namespace WahooPowerMeter.Processors
             return BitConverter.ToInt32(byteArrayIn, 0);
         }
 
-        private static int GetShortFromWithinByteArray(byte[] data, int index)
+        private int GetShortFromWithinByteArray(byte[] data, int index)
         {
             if (data.Length < index + 2)
             {
-                Console.WriteLine("Error: Insufficient bytes in the array.");
+                Logger.LogDebug("Error: Insufficient bytes in the array.");
                 return 0;
             }
 

@@ -1,4 +1,5 @@
 ﻿using InTheHand.Bluetooth;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,37 +21,45 @@ namespace WahooPowerMeter.Services
 
         private readonly Guid ServiceUUID = new Guid("00001816-0000-1000-8000-00805f9b34fb");
         private readonly Guid CharacteristicUUID = new Guid("00002a5b-0000-1000-8000-00805f9b34fb");
-        private readonly IPacketProcessor PacketProcessor = new CSCPacketProcessor();
+        private readonly IPacketProcessor PacketProcessor;
 
         public event SpeedSensorValueChangedDelegate ValueChanged;        
         public UnitOfMeasurement Unit => UnitOfMeasurement.KmPerHour;
         public float Value => KilometresPerHour;
 
+        private readonly ILogger<SpeedSensorService> Logger;
+
+        public SpeedSensorService(IPacketProcessor packetProcessor, ILogger<SpeedSensorService> logger)
+        {
+            PacketProcessor = packetProcessor;
+            Logger = logger;
+        }
+
         public async Task<bool> ConnectAsync()
         {
-            Console.WriteLine("Scanning for devices...");
+            Logger.LogInformation("Scanning for devices...");
 
             var discoveredDevices = await Bluetooth.ScanForDevicesAsync();
-            Console.WriteLine($"Found [{discoveredDevices?.Count}] devices");
+            Logger.LogInformation($"Found [{discoveredDevices?.Count}] devices");
 
             var device = discoveredDevices.FirstOrDefault(d => d.Name.Contains(SpeedSensorName));
 
             if (device == null)
             {
-                Console.WriteLine($"Could not find device [{SpeedSensorName }]");
+                Logger.LogError($"Could not find device [{SpeedSensorName }]");
                 return false;
             }
 
             await device.Gatt.ConnectAsync();
 
-            Console.WriteLine($"Connected to [{device.Name}]");
+            Logger.LogInformation($"Connected to [{device.Name}]");
 
             var serives = await device.Gatt.GetPrimaryServicesAsync();
             var service = serives.FirstOrDefault(s => s.Uuid.Value == ServiceUUID);
 
             if (service == null)
             {
-                Console.WriteLine("Could not find service");
+                Logger.LogError("Could not find service");
                 return false;
             }
 
@@ -59,14 +68,14 @@ namespace WahooPowerMeter.Services
 
             if (characteristic == null)
             {
-                Console.WriteLine("Could not find characteristic");
+                Logger.LogError("Could not find characteristic");
                 return false;
             }            
 
             await characteristic.StartNotificationsAsync();
             characteristic.CharacteristicValueChanged += Characteristic_ValueChanged;
 
-            Console.WriteLine($"Subscribing to notifications for characteristic [{characteristic.UserDescription}] on service [{service.Uuid}]");
+            Logger.LogDebug($"Subscribing to notifications for characteristic [{characteristic.UserDescription}] on service [{service.Uuid}]");
 
             return true;
         }
