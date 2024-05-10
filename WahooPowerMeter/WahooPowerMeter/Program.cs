@@ -30,7 +30,7 @@ namespace WahooPowerMeter
         {
             SpeedSensorService.ValueChanged += SpeedSensorService_ValueChanged;
             PowerMeterService.ValueChanged += PowerService_ValueChanged;
-            SpeechService.Recognized += SpeedService_Recognized;
+            SpeechService.Recognized += SpeechService_Recognized;
 
             var isConected = await SpeedSensorService.ConnectAsync();
 
@@ -57,7 +57,7 @@ namespace WahooPowerMeter
             Logger.LogInformation($"Power: [{value}] {PowerMeterService.Unit.ToString()}");
         }
 
-        private async void SpeedService_Recognized(string value)
+        private async void SpeechService_Recognized(string value)
         {
             var command = value.ToLower().Trim('.');
             var message = string.Empty;
