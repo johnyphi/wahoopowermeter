@@ -1,6 +1,5 @@
 ﻿using Microsoft.CognitiveServices.Speech;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Threading.Tasks;
 
 namespace WahooPowerMeter.Services

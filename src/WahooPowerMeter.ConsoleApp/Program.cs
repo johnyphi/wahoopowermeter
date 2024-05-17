@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using WahooPowerMeter.Processors;
 using WahooPowerMeter.Services;
 
-namespace WahooPowerMeter
+namespace WahooPowerMeter.ConsoleApp
 {
     public class WahooPowerMeterApp
     {
@@ -30,18 +30,22 @@ namespace WahooPowerMeter
         {
             SpeedSensorService.ValueChanged += SpeedSensorService_ValueChanged;
             PowerMeterService.ValueChanged += PowerService_ValueChanged;
-            SpeechService.Recognized += SpeechService_Recognized;
+            //SpeechService.Recognized += SpeechService_Recognized;
+
+            Logger.LogInformation("Press any key to start the session");
+            Console.ReadKey();
 
             var isConected = await SpeedSensorService.ConnectAsync();
 
             if (!isConected)
             {
                 Logger.LogWarning("Could not connect to speed sensor");
-                return;
             }
-
-            await PowerMeterService.StartAsync();
-            await SpeechService.StartContinuousRecognitionAsync();
+            else
+            {
+                await PowerMeterService.StartAsync();
+                //await SpeechService.StartContinuousRecognitionAsync();
+            }
 
             Console.ReadKey();
         }
@@ -64,12 +68,32 @@ namespace WahooPowerMeter
 
             if (command.Contains("increase resistance"))
             {
-                ReistanceLevel++;
+                int increment = ExtractResistanceLevel(command);
+
+                if (increment > 0)
+                {
+                    ReistanceLevel += increment;
+                }
+                else
+                {
+                    ReistanceLevel++;
+                }
+
                 message = $"Resistance level increased to {ReistanceLevel}";
             }
             else if (command.Contains("decrease resistance"))
             {
-                ReistanceLevel--;
+                int decrement = ExtractResistanceLevel(command);
+
+                if (decrement > 0)
+                {
+                    ReistanceLevel -= decrement;
+                }
+                else
+                {
+                    ReistanceLevel--;
+                }
+
                 message = $"Resistance level decreased to {ReistanceLevel}";
             }
             else if (command.Contains("current resistance"))
@@ -86,6 +110,24 @@ namespace WahooPowerMeter
                 await SpeechService.SpeakTextAsync(message);
                 Logger.LogInformation(message);
             }
+
+            // Update resistance level
+        }
+
+        private int ExtractResistanceLevel(string command)
+        {
+            var parts = command.Split(' ');
+            var level = 0;
+
+            foreach (var part in parts)
+            {
+                if (int.TryParse(part, out level))
+                {
+                    return level;
+                }
+            }
+
+            return level;
         }
     }
 

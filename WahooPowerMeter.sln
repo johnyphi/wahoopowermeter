@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WahooPowerMeter.Models", "src\WahooPowerMeter.Models\WahooPowerMeter.Models.csproj", "{5E82BE37-6F4B-4BDC-9472-A810207F82A0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WahooPowerMeter.Processors", "src\WahooPowerMeter.Processors\WahooPowerMeter.Processors.csproj", "{1DD99878-20B3-4EA2-803F-0727B1C4FFB5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WahooPowerMeter.Services", "src\WahooPowerMeter.Services\WahooPowerMeter.Services.csproj", "{27CEAFBB-7A21-40D1-AE45-A34BA3263D4F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WahooPowerMeter.ConsoleApp", "src\WahooPowerMeter.ConsoleApp\WahooPowerMeter.ConsoleApp.csproj", "{4CABC448-11C9-4140-9369-F95700E0B2E6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5E82BE37-6F4B-4BDC-9472-A810207F82A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E82BE37-6F4B-4BDC-9472-A810207F82A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E82BE37-6F4B-4BDC-9472-A810207F82A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E82BE37-6F4B-4BDC-9472-A810207F82A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DD99878-20B3-4EA2-803F-0727B1C4FFB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DD99878-20B3-4EA2-803F-0727B1C4FFB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DD99878-20B3-4EA2-803F-0727B1C4FFB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DD99878-20B3-4EA2-803F-0727B1C4FFB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27CEAFBB-7A21-40D1-AE45-A34BA3263D4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27CEAFBB-7A21-40D1-AE45-A34BA3263D4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27CEAFBB-7A21-40D1-AE45-A34BA3263D4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27CEAFBB-7A21-40D1-AE45-A34BA3263D4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CABC448-11C9-4140-9369-F95700E0B2E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CABC448-11C9-4140-9369-F95700E0B2E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CABC448-11C9-4140-9369-F95700E0B2E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CABC448-11C9-4140-9369-F95700E0B2E6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {892EC45D-E0A2-44D4-A1B2-8A807EAE0E1C}
+	EndGlobalSection
+EndGlobal
