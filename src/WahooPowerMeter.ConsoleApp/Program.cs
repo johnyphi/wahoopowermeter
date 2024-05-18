@@ -12,16 +12,18 @@ namespace WahooPowerMeter.ConsoleApp
         private ISpeedSensorService SpeedSensorService;
         private IPowerMeterService PowerMeterService;
         private ISpeechService SpeechService;
+        private IResistanceProcessor ResistanceProcessor;
 
-        private int ReistanceLevel = 0;
+        private int ResistanceLevel = 0;
 
         private readonly ILogger<WahooPowerMeterApp> Logger;
 
-        public WahooPowerMeterApp(ISpeedSensorService speedSensorService, IPowerMeterService powerMeterService, ISpeechService speechService, ILogger<WahooPowerMeterApp> logger)
+        public WahooPowerMeterApp(ISpeedSensorService speedSensorService, IPowerMeterService powerMeterService, ISpeechService speechService, IResistanceProcessor resistanceProcessor, ILogger<WahooPowerMeterApp> logger)
         { 
             SpeedSensorService = speedSensorService;
             PowerMeterService = powerMeterService;
             SpeechService = speechService;
+            ResistanceProcessor = resistanceProcessor;
 
             Logger = logger;
         }
@@ -66,68 +68,24 @@ namespace WahooPowerMeter.ConsoleApp
             var command = value.ToLower().Trim('.');
             var message = string.Empty;
 
-            if (command.Contains("increase resistance"))
-            {
-                int increment = ExtractResistanceLevel(command);
+            var newResistanceLevel = ResistanceProcessor.ProcessResistanceCommand(command, ResistanceLevel);
 
-                if (increment > 0)
-                {
-                    ReistanceLevel += increment;
-                }
-                else
-                {
-                    ReistanceLevel++;
-                }
-
-                message = $"Resistance level increased to {ReistanceLevel}";
-            }
-            else if (command.Contains("decrease resistance"))
+            if (newResistanceLevel > ResistanceLevel)
             {
-                int decrement = ExtractResistanceLevel(command);
-
-                if (decrement > 0)
-                {
-                    ReistanceLevel -= decrement;
-                }
-                else
-                {
-                    ReistanceLevel--;
-                }
-
-                message = $"Resistance level decreased to {ReistanceLevel}";
+                message = $"Increasing resistance to {newResistanceLevel}";
             }
-            else if (command.Contains("current resistance"))
+            else if (newResistanceLevel < ResistanceLevel)
             {
-                message = $"Current resistance level is {ReistanceLevel}";
+                message = $"Decreasing resistance to {newResistanceLevel}";
             }
-            else if (command.Contains("stop session"))
-            {
-                message = "Stopping session";
-            }
+
+            ResistanceLevel = newResistanceLevel;
 
             if (!string.IsNullOrEmpty(message))
             {
                 await SpeechService.SpeakTextAsync(message);
                 Logger.LogInformation(message);
             }
-
-            // Update resistance level
-        }
-
-        private int ExtractResistanceLevel(string command)
-        {
-            var parts = command.Split(' ');
-            var level = 0;
-
-            foreach (var part in parts)
-            {
-                if (int.TryParse(part, out level))
-                {
-                    return level;
-                }
-            }
-
-            return level;
         }
     }
 

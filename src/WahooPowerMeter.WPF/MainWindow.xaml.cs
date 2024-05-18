@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using WahooPowerMeter.Processors;
 using WahooPowerMeter.Services;
 
 namespace WahooPowerMeter.WPF
@@ -22,18 +23,20 @@ namespace WahooPowerMeter.WPF
         private ISpeedSensorService SpeedSensorService;
         private IPowerMeterService PowerMeterService;
         private ISpeechService SpeechService;
+        private IResistanceProcessor ResistanceProcessor;
 
-        private int ReistanceLevel = 0;
+        private int ResistanceLevel = 0;
 
         private ApplicationState State = ApplicationState.Stopped;
 
         private readonly ILogger<MainWindow> Logger;
 
-        public MainWindow(ISpeedSensorService speedSensorService, IPowerMeterService powerMeterService, ISpeechService speechService, ILogger<MainWindow> logger)
+        public MainWindow(ISpeedSensorService speedSensorService, IPowerMeterService powerMeterService, ISpeechService speechService, IResistanceProcessor resistanceProcessor, ILogger<MainWindow> logger)
         {
             SpeedSensorService = speedSensorService;
             PowerMeterService = powerMeterService;
             SpeechService = speechService;
+            ResistanceProcessor = resistanceProcessor;
 
             Logger = logger;
 
@@ -48,7 +51,7 @@ namespace WahooPowerMeter.WPF
         {
             var isConected = await SpeedSensorService.ConnectAsync();
 
-            txtResistance.Text = ReistanceLevel.ToString();
+            txtResistance.Text = ResistanceLevel.ToString();
 
             if (!isConected)
             {
@@ -79,7 +82,7 @@ namespace WahooPowerMeter.WPF
                 txtSpeed.Text = value.ToString("F2");
             });
             
-            await PowerMeterService.UpdateAsync(value);
+            await PowerMeterService.UpdateAsync(value, ResistanceLevel);
         }
 
         private void PowerService_ValueChanged(int value)
@@ -97,50 +100,15 @@ namespace WahooPowerMeter.WPF
             var command = value.ToLower().Trim('.');
             var message = string.Empty;
 
-            if (command.Contains("increase resistance"))
+            var newResistanceLevel = ResistanceProcessor.ProcessResistanceCommand(command, ResistanceLevel);
+
+            if (newResistanceLevel > ResistanceLevel)
             {
-                int increment = ExtractResistanceLevel(command);
-
-                if (increment > 0)
-                {
-                    ReistanceLevel += increment;
-                }
-                else
-                {
-                    ReistanceLevel++;
-                }
-
-                message = $"Resistance level increased to {ReistanceLevel}";
+                message = $"Increasing resistance to {newResistanceLevel}";
             }
-            else if (command.Contains("decrease resistance"))
+            else if (newResistanceLevel < ResistanceLevel)
             {
-                int decrement = ExtractResistanceLevel(command);
-
-                if (decrement > 0)
-                {
-                    ReistanceLevel -= decrement;
-                }
-                else
-                {
-                    ReistanceLevel--;
-                }
-
-                message = $"Resistance level decreased to {ReistanceLevel}";
-            }
-            else if (command.Contains("set resistance"))
-            {
-                int resistance = ExtractResistanceLevel(command);
-                ReistanceLevel = resistance;
-
-                message = $"Resistance level set to {ReistanceLevel}";
-            }
-            else if (command.Contains("current resistance"))
-            {
-                message = $"Current resistance level is {ReistanceLevel}";
-            }
-            else if (command.Contains("stop session"))
-            {
-                message = "Stopping session";
+                message = $"Decreasing resistance to {newResistanceLevel}";
             }
 
             if (!string.IsNullOrEmpty(message))
@@ -149,26 +117,12 @@ namespace WahooPowerMeter.WPF
                 Logger.LogInformation(message);
             }
 
+            ResistanceLevel = newResistanceLevel;
+
             Dispatcher.Invoke(() =>
             {
-                txtResistance.Text = ReistanceLevel.ToString();
+                txtResistance.Text = ResistanceLevel.ToString();
             });
-        }
-
-        private int ExtractResistanceLevel(string command)
-        {
-            var parts = command.Split(' ');
-            var level = 0;
-
-            foreach (var part in parts)
-            {
-                if (int.TryParse(part, out level))
-                {
-                    return level;
-                }
-            }
-
-            return level;
         }
 
         private async void btnStart_Click(object sender, RoutedEventArgs e)

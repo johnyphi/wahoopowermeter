@@ -71,10 +71,10 @@ namespace WahooPowerMeter.Services
             Logger.LogInformation("Power meter service started.");
         }
 
-        public async Task UpdateAsync(float speedInKmH)
+        public async Task UpdateAsync(float speedInKmH, int resistanceLevel)
         {
-            double rawPowerInWatts = ((0.0009925 * speedInKmH + 0.003019) * speedInKmH + 6.377) * speedInKmH;
-            PowerInWatts = (int)rawPowerInWatts;
+            //PowerInWatts = CalcuatatePowerOG(speedInKmH);
+            PowerInWatts = CalculateVirtualPower(speedInKmH, resistanceLevel);
 
             byte[] data = FormatPowerMeasurement(PowerInWatts);
             var writer = new DataWriter();
@@ -111,6 +111,26 @@ namespace WahooPowerMeter.Services
             byte[] packet = { flags, powerMSB, powerLSB, pedalPowerBalance, pedalPowerBalanceReference, accumulatedTorque, accumulatedTorqueSource };
 
             return packet;
+        }
+
+        private static int CalcuatatePowerOG(float speedInKmH)
+        {
+            double rawPowerInWatts = ((0.0009925 * speedInKmH + 0.003019) * speedInKmH + 6.377) * speedInKmH;
+            return (int)rawPowerInWatts;
+        }
+
+        public int CalculateVirtualPower(double speedKmh, int resistanceLevel)
+        {
+            const double constant = 0.1;
+            const double exponent = 2.5;
+
+            // Calculate the resistance multiplier
+            double resistanceMultiplier = 1 + (resistanceLevel / 10.0);
+
+            // Calculate power using the power curve formula
+            double power = constant * Math.Pow(speedKmh, exponent) * resistanceMultiplier;
+
+            return (int)power;
         }
     }
 }

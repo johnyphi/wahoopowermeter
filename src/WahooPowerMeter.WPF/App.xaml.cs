@@ -28,6 +28,7 @@ namespace WahooPowerMeter.WPF
                 .AddSingleton<IPowerMeterService, PowerMeterService>()
                 .AddSingleton<ISpeechService, SpeechService>()
                 .AddSingleton<IPacketProcessor, CSCPacketProcessor>()
+                .AddSingleton<IResistanceProcessor, ResistanceProcessor>()
                 .BuildServiceProvider();
 
             var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();

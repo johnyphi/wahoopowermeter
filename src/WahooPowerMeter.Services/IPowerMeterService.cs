@@ -12,6 +12,6 @@ namespace WahooPowerMeter.Services
         int Value { get; }
 
         Task StartAsync();
-        Task UpdateAsync(float speedInKmH);
+        Task UpdateAsync(float speedInKmH, int resistanceLevel);
     }
 }
