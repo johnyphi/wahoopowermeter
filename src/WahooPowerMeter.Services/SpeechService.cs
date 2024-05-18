@@ -6,16 +6,16 @@ namespace WahooPowerMeter.Services
 {
     public class SpeechService : ISpeechService
     {
+        private ISpeechServiceConfiguration Configuration;
+
         private SpeechSynthesizer SpeechSynthesizer;
         private TaskCompletionSource<int> StopRecognitionTask;
 
-        private string SpeechKey = "ad459262d8ec4047b6cb05084d89877d";
-        private string SpeechRegion = "uksouth";
-
         private readonly ILogger<SpeechService> Logger;
 
-        public SpeechService(ILogger<SpeechService> logger)
+        public SpeechService(ISpeechServiceConfiguration configuration, ILogger<SpeechService> logger)
         {
+            Configuration = configuration;
             Logger = logger;
         }
 
@@ -25,7 +25,7 @@ namespace WahooPowerMeter.Services
         {
             if (SpeechSynthesizer == null)
             {
-                SpeechSynthesizer = new SpeechSynthesizer(SpeechConfig.FromSubscription(SpeechKey, SpeechRegion));
+                SpeechSynthesizer = new SpeechSynthesizer(SpeechConfig.FromSubscription(Configuration.SpeechKey, Configuration.SpeechRegion));
             }
 
             using (var result = await SpeechSynthesizer.SpeakTextAsync(text))
@@ -44,7 +44,7 @@ namespace WahooPowerMeter.Services
         public async Task StartContinuousRecognitionAsync()
         {
             StopRecognitionTask = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
-            var config = SpeechConfig.FromSubscription(SpeechKey, SpeechRegion);
+            var config = SpeechConfig.FromSubscription(Configuration.SpeechKey, Configuration.SpeechRegion);
 
             // Creates a speech recognizer using microphone as audio input.
             using (var recognizer = new SpeechRecognizer(config))

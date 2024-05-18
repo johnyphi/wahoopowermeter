@@ -44,7 +44,7 @@
         <Viewbox Grid.Row="2" Stretch="Uniform">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                 <TextBlock Text="Resistance Level" Foreground="White" FontSize="20" HorizontalAlignment="Center"/>
-                <TextBlock Text="1" x:Name="txtResistance" Foreground="#FF0000" FontSize="40" FontWeight="Bold" HorizontalAlignment="Center"/>
+                <TextBlock Text="0" x:Name="txtResistance" Foreground="#FF0000" FontSize="40" FontWeight="Bold" HorizontalAlignment="Center"/>
             </StackPanel>
         </Viewbox>
 

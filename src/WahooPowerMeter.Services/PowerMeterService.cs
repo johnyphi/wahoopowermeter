@@ -124,8 +124,8 @@ namespace WahooPowerMeter.Services
             const double constant = 0.1;
             const double exponent = 2.5;
 
-            // Calculate the resistance multiplier
-            double resistanceMultiplier = 1 + (resistanceLevel / 10.0);
+            // Calculate the resistance multiplier (for 12 resistance levels)
+            double resistanceMultiplier = 1 + (resistanceLevel - 1) / 11.0;
 
             // Calculate power using the power curve formula
             double power = constant * Math.Pow(speedKmh, exponent) * resistanceMultiplier;

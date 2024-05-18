@@ -25,6 +25,9 @@ namespace WahooPowerMeter.WPF
         private ISpeechService SpeechService;
         private IResistanceProcessor ResistanceProcessor;
 
+        // Set spin bike at 16 quarter turns (4 full turns) from fully off, locked out.
+        // 0-11 (3 full turns or 12 quarter turns) of resistance
+        private const int MaxResistanceLevel = 11; 
         private int ResistanceLevel = 0;
 
         private ApplicationState State = ApplicationState.Stopped;
@@ -111,13 +114,16 @@ namespace WahooPowerMeter.WPF
                 message = $"Decreasing resistance to {newResistanceLevel}";
             }
 
-            if (!string.IsNullOrEmpty(message))
+            if (!string.IsNullOrEmpty(message) && newResistanceLevel <= MaxResistanceLevel)
             {
+                ResistanceLevel = newResistanceLevel;
                 await SpeechService.SpeakTextAsync(message);
                 Logger.LogInformation(message);
             }
-
-            ResistanceLevel = newResistanceLevel;
+            else
+            {
+                await SpeechService.SpeakTextAsync("Resistance level is at maximum");
+            }
 
             Dispatcher.Invoke(() =>
             {

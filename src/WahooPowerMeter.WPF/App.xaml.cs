@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.Windows;
 using WahooPowerMeter.Processors;
 using WahooPowerMeter.Services;
+using WahooPowerMeter.WPF.Configuration;
 
 namespace WahooPowerMeter.WPF
 {
@@ -27,6 +25,7 @@ namespace WahooPowerMeter.WPF
                 .AddSingleton<ISpeedSensorService, SpeedSensorService>()
                 .AddSingleton<IPowerMeterService, PowerMeterService>()
                 .AddSingleton<ISpeechService, SpeechService>()
+                .AddSingleton<ISpeechServiceConfiguration, SpeechServiceConfiguration>()
                 .AddSingleton<IPacketProcessor, CSCPacketProcessor>()
                 .AddSingleton<IResistanceProcessor, ResistanceProcessor>()
                 .BuildServiceProvider();
