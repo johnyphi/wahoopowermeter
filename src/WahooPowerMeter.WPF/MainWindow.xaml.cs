@@ -1,13 +1,23 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
-using WahooPowerMeter.Processors;
+using System.Windows;
+using System.Windows.Media;
 using WahooPowerMeter.Services;
 
-namespace WahooPowerMeter.ConsoleApp
+namespace WahooPowerMeter.WPF
 {
-    public class WahooPowerMeterApp
+    internal enum ApplicationState
+    {
+        Stopped,
+        Scanning,
+        Running
+    }
+
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
     {
         private ISpeedSensorService SpeedSensorService;
         private IPowerMeterService PowerMeterService;
@@ -15,50 +25,71 @@ namespace WahooPowerMeter.ConsoleApp
 
         private int ReistanceLevel = 0;
 
-        private readonly ILogger<WahooPowerMeterApp> Logger;
+        private ApplicationState State = ApplicationState.Stopped;
 
-        public WahooPowerMeterApp(ISpeedSensorService speedSensorService, IPowerMeterService powerMeterService, ISpeechService speechService, ILogger<WahooPowerMeterApp> logger)
-        { 
+        private readonly ILogger<MainWindow> Logger;
+
+        public MainWindow(ISpeedSensorService speedSensorService, IPowerMeterService powerMeterService, ISpeechService speechService, ILogger<MainWindow> logger)
+        {
             SpeedSensorService = speedSensorService;
             PowerMeterService = powerMeterService;
             SpeechService = speechService;
 
             Logger = logger;
-        }
 
-        public async Task RunAsync()
-        {
+            InitializeComponent();
+
             SpeedSensorService.ValueChanged += SpeedSensorService_ValueChanged;
             PowerMeterService.ValueChanged += PowerService_ValueChanged;
             SpeechService.Recognized += SpeechService_Recognized;
+        }
 
-            Logger.LogInformation("Press any key to start the session");
-            Console.ReadKey();
+        private async Task RunAsync()
+        {
+            var isConected = await SpeedSensorService.ConnectAsync();
 
-            /*var isConected = await SpeedSensorService.ConnectAsync();
+            txtResistance.Text = ReistanceLevel.ToString();
 
             if (!isConected)
             {
                 Logger.LogWarning("Could not connect to speed sensor");
+
+                btnStart.IsEnabled = true;
+                btnStart.Content = "Start";
+                State = ApplicationState.Stopped;
             }
             else
-            {*/
-                //await PowerMeterService.StartAsync();
-                await SpeechService.StartContinuousRecognitionAsync();
-            //}
+            {
+                btnStart.IsEnabled = false;
+                btnStart.Content = "Stop";
+                elSpeedSensor.Fill = Brushes.Green;
+                State = ApplicationState.Running;
 
-            Console.ReadKey();
+                await PowerMeterService.StartAsync();
+                await SpeechService.StartContinuousRecognitionAsync();
+            }
         }
 
         private async void SpeedSensorService_ValueChanged(float value)
         {
             Logger.LogInformation($"Speed: [{value}] {SpeedSensorService.Unit.ToString()}");
+
+            Dispatcher.Invoke(() =>
+            {
+                txtSpeed.Text = value.ToString("F2");
+            });
+            
             await PowerMeterService.UpdateAsync(value);
         }
 
         private void PowerService_ValueChanged(int value)
         {
             Logger.LogInformation($"Power: [{value}] {PowerMeterService.Unit.ToString()}");
+
+            Dispatcher.Invoke(() =>
+            {
+                txtPower.Text = value.ToString();
+            });
         }
 
         private async void SpeechService_Recognized(string value)
@@ -96,6 +127,13 @@ namespace WahooPowerMeter.ConsoleApp
 
                 message = $"Resistance level decreased to {ReistanceLevel}";
             }
+            else if (command.Contains("set resistance"))
+            {
+                int resistance = ExtractResistanceLevel(command);
+                ReistanceLevel = resistance;
+
+                message = $"Resistance level set to {ReistanceLevel}";
+            }
             else if (command.Contains("current resistance"))
             {
                 message = $"Current resistance level is {ReistanceLevel}";
@@ -111,7 +149,10 @@ namespace WahooPowerMeter.ConsoleApp
                 Logger.LogInformation(message);
             }
 
-            // Update resistance level
+            Dispatcher.Invoke(() =>
+            {
+                txtResistance.Text = ReistanceLevel.ToString();
+            });
         }
 
         private int ExtractResistanceLevel(string command)
@@ -129,23 +170,20 @@ namespace WahooPowerMeter.ConsoleApp
 
             return level;
         }
-    }
 
-    public class Program
-    {
-        public async static Task Main(string[] args)
+        private async void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            var serviceProvider = new ServiceCollection()
-                .AddLogging(lb => lb.AddConsole())
-                .AddSingleton<WahooPowerMeterApp>()
-                .AddSingleton<ISpeedSensorService, SpeedSensorService>()
-                .AddSingleton<IPowerMeterService, PowerMeterService>()
-                .AddSingleton<ISpeechService, SpeechService>()
-                .AddSingleton<IPacketProcessor, CSCPacketProcessor>()
-                .BuildServiceProvider();
-
-            var app = serviceProvider.GetRequiredService<WahooPowerMeterApp>();
-            await app.RunAsync();            
-        }      
+            switch (State)
+            {
+                case ApplicationState.Stopped:
+                    btnStart.IsEnabled = false;
+                    btnStart.Content = "Scanning...";
+                    await RunAsync();
+                    break;
+                case ApplicationState.Running:
+                    // Stop everything
+                    break;
+            }            
+        }
     }
 }

@@ -43,6 +43,7 @@ namespace WahooPowerMeter.Services
 
         public async Task StartContinuousRecognitionAsync()
         {
+            StopRecognitionTask = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
             var config = SpeechConfig.FromSubscription(SpeechKey, SpeechRegion);
 
             // Creates a speech recognizer using microphone as audio input.
