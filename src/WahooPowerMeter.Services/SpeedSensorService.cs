@@ -10,27 +10,30 @@ namespace WahooPowerMeter.Services
 {
     public class SpeedSensorService : ISpeedSensorService
     {
-        private const string SpeedSensorName = "Wahoo SPEED";
+        private const float PI = (float)Math.PI;
+
+        private readonly string SpeedSensorName;
+        private readonly int WheelDiameterMillimeters;
+
+        private readonly Guid ServiceUUID = new Guid("00001816-0000-1000-8000-00805f9b34fb");
+        private readonly Guid CharacteristicUUID = new Guid("00002a5b-0000-1000-8000-00805f9b34fb");
+        private readonly IPacketProcessor PacketProcessor;
+        private readonly ILogger<SpeedSensorService> Logger;
 
         private int PreviousRevolutions;
         private int PreviousTicks;
         private float RevolutionsPerSecond;
         private float KilometresPerHour;
-        private const float WheelDiameterMillimeters = 450; 
-        private const float PI = (float)Math.PI;
-
-        private readonly Guid ServiceUUID = new Guid("00001816-0000-1000-8000-00805f9b34fb");
-        private readonly Guid CharacteristicUUID = new Guid("00002a5b-0000-1000-8000-00805f9b34fb");
-        private readonly IPacketProcessor PacketProcessor;
 
         public event SpeedSensorValueChangedDelegate ValueChanged;        
         public UnitOfMeasurement Unit => UnitOfMeasurement.KmPerHour;
         public float Value => KilometresPerHour;
 
-        private readonly ILogger<SpeedSensorService> Logger;
-
-        public SpeedSensorService(IPacketProcessor packetProcessor, ILogger<SpeedSensorService> logger)
+        public SpeedSensorService(ISpeedSensorServiceConfiguration configuration, IPacketProcessor packetProcessor, ILogger<SpeedSensorService> logger)
         {
+            SpeedSensorName = configuration.SpeedSensorName;
+            WheelDiameterMillimeters = configuration.WheelDiameterMillimeters;
+
             PacketProcessor = packetProcessor;
             Logger = logger;
         }
@@ -100,7 +103,7 @@ namespace WahooPowerMeter.Services
                 {
                     RevolutionsPerSecond = 1000 / ticksPerRevolution;
 
-                    float metersPerSecond = RevolutionsPerSecond * (WheelDiameterMillimeters / 1000) * PI;
+                    float metersPerSecond = RevolutionsPerSecond * ((float)WheelDiameterMillimeters / 1000) * PI;
                     KilometresPerHour = metersPerSecond * 3600 / 1000;
                     ValueChanged?.Invoke(KilometresPerHour);
                 }

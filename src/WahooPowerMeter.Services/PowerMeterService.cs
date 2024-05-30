@@ -10,6 +10,8 @@ namespace WahooPowerMeter.Services
 {
     public class PowerMeterService : IPowerMeterService
     {
+        private readonly double Constant;
+
         private GattLocalCharacteristic PowerCharacteristic = null;
         private int PowerInWatts = 0;
 
@@ -19,8 +21,9 @@ namespace WahooPowerMeter.Services
 
         private readonly ILogger<PowerMeterService> Logger;
 
-        public PowerMeterService(ILogger<PowerMeterService> logger)
+        public PowerMeterService(IPowerMeterServiceConfiguration configuration, ILogger<PowerMeterService> logger)
         {
+            Constant = configuration.Constant;
             Logger = logger;
         }
 
@@ -115,14 +118,13 @@ namespace WahooPowerMeter.Services
             // 20km/h @ 11 resistance levels = 400W
             //
 
-            const double constant = 0.1118;
             const double exponent = 2.5;
 
             // Calculate the resistance multiplier (for 12 resistance levels)
             double resistanceMultiplier = 1 + (resistanceLevel / 11.0);
 
             // Calculate power using the power curve formula
-            double power = constant * Math.Pow(speedKmh, exponent) * resistanceMultiplier;
+            double power = Constant * Math.Pow(speedKmh, exponent) * resistanceMultiplier;
 
             return (int)Math.Round(power);
         }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using WahooPowerMeter.ConsoleApp.Configuration;
 using WahooPowerMeter.Processors;
 using WahooPowerMeter.Services;
 
@@ -88,7 +89,9 @@ namespace WahooPowerMeter.ConsoleApp
                 .AddLogging(lb => lb.AddConsole())
                 .AddSingleton<WahooPowerMeterApp>()
                 .AddSingleton<ISpeedSensorService, SpeedSensorService>()
+                .AddSingleton<ISpeedSensorServiceConfiguration, SpeedSensorServiceConfiguration>()
                 .AddSingleton<IPowerMeterService, PowerMeterService>()
+                .AddSingleton<IPowerMeterServiceConfiguration, PowerMeterServiceConfiguration>()
                 .AddSingleton<IResistanceProcessor, ResistanceProcessor>()
                 .AddSingleton<IPacketProcessor, CSCPacketProcessor>()
                 .BuildServiceProvider();
