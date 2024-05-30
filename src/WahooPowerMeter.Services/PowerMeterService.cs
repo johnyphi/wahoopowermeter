@@ -107,7 +107,7 @@ namespace WahooPowerMeter.Services
         }
 
         private static int CalcuatatePowerOG(float speedInKmH)
-        {dd
+        {
             double rawPowerInWatts = ((0.0009925 * speedInKmH + 0.003019) * speedInKmH + 6.377) * speedInKmH;
             return (int)rawPowerInWatts;
         }
