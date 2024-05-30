@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using WahooPowerMeter.Processors;
 using WahooPowerMeter.Services;
@@ -11,19 +12,16 @@ namespace WahooPowerMeter.ConsoleApp
     {
         private ISpeedSensorService SpeedSensorService;
         private IPowerMeterService PowerMeterService;
-        private ISpeechService SpeechService;
         private IResistanceProcessor ResistanceProcessor;
 
         private int ResistanceLevel = 0;
 
         private readonly ILogger<WahooPowerMeterApp> Logger;
 
-        public WahooPowerMeterApp(ISpeedSensorService speedSensorService, IPowerMeterService powerMeterService, ISpeechService speechService, IResistanceProcessor resistanceProcessor, ILogger<WahooPowerMeterApp> logger)
+        public WahooPowerMeterApp(ISpeedSensorService speedSensorService, IPowerMeterService powerMeterService, ILogger<WahooPowerMeterApp> logger)
         { 
             SpeedSensorService = speedSensorService;
             PowerMeterService = powerMeterService;
-            SpeechService = speechService;
-            ResistanceProcessor = resistanceProcessor;
 
             Logger = logger;
         }
@@ -32,60 +30,53 @@ namespace WahooPowerMeter.ConsoleApp
         {
             SpeedSensorService.ValueChanged += SpeedSensorService_ValueChanged;
             PowerMeterService.ValueChanged += PowerService_ValueChanged;
-            SpeechService.Recognized += SpeechService_Recognized;
 
             Logger.LogInformation("Press any key to start the session");
             Console.ReadKey();
 
-            /*var isConected = await SpeedSensorService.ConnectAsync();
+            var isConected = await SpeedSensorService.ConnectAsync();
 
             if (!isConected)
             {
                 Logger.LogWarning("Could not connect to speed sensor");
             }
             else
-            {*/
-                //await PowerMeterService.StartAsync();
-                await SpeechService.StartContinuousRecognitionAsync();
-            //}
+            {
+                await PowerMeterService.StartAsync();
+            }
 
-            Console.ReadKey();
+            while (true)
+            {
+                var key = Console.ReadKey();
+
+                switch (key.Key)
+                {
+                    case ConsoleKey.Q:
+                        Logger.LogInformation("Quitting...");
+                        return;
+                    case ConsoleKey.UpArrow:
+                        ResistanceLevel = Math.Min(ResistanceLevel + 1, 11);
+                        break;
+                    case ConsoleKey.DownArrow:
+                        ResistanceLevel = Math.Max(ResistanceLevel - 1, 0);
+                        break;
+                }
+
+                Logger.LogInformation($"Resistance level: {ResistanceLevel}");
+
+                Thread.Sleep(1000);
+            }
         }
 
         private async void SpeedSensorService_ValueChanged(float value)
         {
-            Logger.LogInformation($"Speed: [{value}] {SpeedSensorService.Unit.ToString()}");
-            await PowerMeterService.UpdateAsync(value);
+            Logger.LogDebug($"Speed: [{value}] {SpeedSensorService.Unit.ToString()}");
+            await PowerMeterService.UpdateAsync(value, ResistanceLevel);
         }
 
         private void PowerService_ValueChanged(int value)
         {
-            Logger.LogInformation($"Power: [{value}] {PowerMeterService.Unit.ToString()}");
-        }
-
-        private async void SpeechService_Recognized(string value)
-        {
-            var command = value.ToLower().Trim('.');
-            var message = string.Empty;
-
-            var newResistanceLevel = ResistanceProcessor.ProcessResistanceCommand(command, ResistanceLevel);
-
-            if (newResistanceLevel > ResistanceLevel)
-            {
-                message = $"Increasing resistance to {newResistanceLevel}";
-            }
-            else if (newResistanceLevel < ResistanceLevel)
-            {
-                message = $"Decreasing resistance to {newResistanceLevel}";
-            }
-
-            ResistanceLevel = newResistanceLevel;
-
-            if (!string.IsNullOrEmpty(message))
-            {
-                await SpeechService.SpeakTextAsync(message);
-                Logger.LogInformation(message);
-            }
+            Logger.LogDebug($"Power: [{value}] {PowerMeterService.Unit.ToString()}");
         }
     }
 
@@ -98,7 +89,7 @@ namespace WahooPowerMeter.ConsoleApp
                 .AddSingleton<WahooPowerMeterApp>()
                 .AddSingleton<ISpeedSensorService, SpeedSensorService>()
                 .AddSingleton<IPowerMeterService, PowerMeterService>()
-                .AddSingleton<ISpeechService, SpeechService>()
+                .AddSingleton<IResistanceProcessor, ResistanceProcessor>()
                 .AddSingleton<IPacketProcessor, CSCPacketProcessor>()
                 .BuildServiceProvider();
 

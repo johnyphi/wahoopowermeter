@@ -16,4 +16,8 @@
     <ProjectReference Include="..\WahooPowerMeter.Services\WahooPowerMeter.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+
 </Project>

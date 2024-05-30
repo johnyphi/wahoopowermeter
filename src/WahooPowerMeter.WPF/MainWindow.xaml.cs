@@ -28,6 +28,7 @@ namespace WahooPowerMeter.WPF
         // Set spin bike at 16 quarter turns (4 full turns) from fully off, locked out.
         // 0-11 (3 full turns or 12 quarter turns) of resistance
         private const int MaxResistanceLevel = 11; 
+        private const int MinResistanceLevel = 0; 
         private int ResistanceLevel = 0;
 
         private ApplicationState State = ApplicationState.Stopped;
@@ -78,14 +79,21 @@ namespace WahooPowerMeter.WPF
 
         private async void SpeedSensorService_ValueChanged(float value)
         {
-            Logger.LogInformation($"Speed: [{value}] {SpeedSensorService.Unit.ToString()}");
+            Logger.LogInformation($"Speed: [{value}] {SpeedSensorService.Unit.ToString()}");           
 
-            Dispatcher.Invoke(() =>
+            try
             {
-                txtSpeed.Text = value.ToString("F2");
-            });
-            
-            await PowerMeterService.UpdateAsync(value, ResistanceLevel);
+                Dispatcher.Invoke(() =>
+                {
+                    txtSpeed.Text = value.ToString("F2");
+                });
+
+                await PowerMeterService.UpdateAsync(value, ResistanceLevel);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error updating power meter");
+            }
         }
 
         private void PowerService_ValueChanged(int value)
@@ -100,35 +108,43 @@ namespace WahooPowerMeter.WPF
 
         private async void SpeechService_Recognized(string value)
         {
-            var command = value.ToLower().Trim('.');
-            var message = string.Empty;
+            try
+            {
+                var command = value.ToLower().Trim('.');
+                var message = string.Empty;
 
-            var newResistanceLevel = ResistanceProcessor.ProcessResistanceCommand(command, ResistanceLevel);
+                var newResistanceLevel = ResistanceProcessor.ProcessResistanceCommand(command, ResistanceLevel);
 
-            if (newResistanceLevel > ResistanceLevel)
-            {
-                message = $"Increasing resistance to {newResistanceLevel}";
-            }
-            else if (newResistanceLevel < ResistanceLevel)
-            {
-                message = $"Decreasing resistance to {newResistanceLevel}";
-            }
+                if (newResistanceLevel > ResistanceLevel)
+                {
+                    message = $"Increasing resistance to {newResistanceLevel}";
+                }
+                else if (newResistanceLevel < ResistanceLevel)
+                {
+                    message = $"Decreasing resistance to {newResistanceLevel}";
+                }
 
-            if (!string.IsNullOrEmpty(message) && newResistanceLevel <= MaxResistanceLevel)
-            {
-                ResistanceLevel = newResistanceLevel;
-                await SpeechService.SpeakTextAsync(message);
-                Logger.LogInformation(message);
-            }
-            else
-            {
-                await SpeechService.SpeakTextAsync("Resistance level is at maximum");
-            }
+                if (newResistanceLevel <= MaxResistanceLevel && newResistanceLevel >= MinResistanceLevel)
+                {
+                    ResistanceLevel = newResistanceLevel;
 
-            Dispatcher.Invoke(() =>
+                    if (!string.IsNullOrEmpty(message))
+                    {
+                        await SpeechService.SpeakTextAsync(message);
+                    }
+
+                    Logger.LogInformation(message);
+                }
+
+                Dispatcher.Invoke(() =>
+                {
+                    txtResistance.Text = ResistanceLevel.ToString();
+                });
+            }
+            catch (Exception ex)
             {
-                txtResistance.Text = ResistanceLevel.ToString();
-            });
+                Logger.LogError(ex, "Error processing speech command");
+            }            
         }
 
         private async void btnStart_Click(object sender, RoutedEventArgs e)

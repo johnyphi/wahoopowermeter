@@ -92,7 +92,7 @@ namespace WahooPowerMeter.Services
             int revolutions = (packet.Revolutions - PreviousRevolutions) & 0xFFFFF;
             int ticks = (packet.Ticks - PreviousTicks) & 0xFFFFF;
                 
-            if (revolutions >= 1 && revolutions <= 5)
+            if (revolutions >= 1 && revolutions <= 10)
             {
                 float ticksPerRevolution = Math.Abs(ticks) / (float)revolutions;
 

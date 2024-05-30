@@ -79,6 +79,7 @@ namespace WahooPowerMeter.Services
             byte[] data = FormatPowerMeasurement(PowerInWatts);
             var writer = new DataWriter();
             writer.WriteBytes(data);
+
             await PowerCharacteristic?.NotifyValueAsync(writer.DetachBuffer());
 
             ValueChanged?.Invoke(PowerInWatts);
@@ -86,29 +87,18 @@ namespace WahooPowerMeter.Services
 
         private static byte[] FormatPowerMeasurement(int powerOutput)
         {
-            // Byte 0: Flags
-            byte flags = 0x01; // Instantaneous power field present
+            // Byte 0-1: Flags
+            byte flagsLSB = 0x01;  // Instantaneous power field present
+            byte flagsMSB = 0x00; 
 
-            // Byte 1: Instantaneous power (LSB)
+            // Byte 2: Instantaneous power (LSB)
             byte powerLSB = (byte)(powerOutput & 0xFF);
 
-            // Byte 2: Instantaneous power (MSB)
+            // Byte 3: Instantaneous power (MSB)
             byte powerMSB = (byte)((powerOutput >> 8) & 0xFF);
 
-            // Byte 3: Pedal power balance (optional, set to 0)
-            byte pedalPowerBalance = 0x00;
-
-            // Byte 4: Pedal power balance reference (optional, set to 0)
-            byte pedalPowerBalanceReference = 0x00;
-
-            // Byte 5: Accumulated torque (optional, set to 0)
-            byte accumulatedTorque = 0x00;
-
-            // Byte 6: Accumulated torque source (optional, set to 0)
-            byte accumulatedTorqueSource = 0x00;
-
             // Construct the packet
-            byte[] packet = { flags, powerMSB, powerLSB, pedalPowerBalance, pedalPowerBalanceReference, accumulatedTorque, accumulatedTorqueSource };
+            byte[] packet = { flagsLSB, flagsMSB, powerLSB, powerMSB };
 
             return packet;
         }
@@ -121,16 +111,20 @@ namespace WahooPowerMeter.Services
 
         public int CalculateVirtualPower(double speedKmh, int resistanceLevel)
         {
-            const double constant = 0.1;
+            //
+            // 20km/h @ 11 resistance levels = 400W
+            //
+
+            const double constant = 0.1118;
             const double exponent = 2.5;
 
             // Calculate the resistance multiplier (for 12 resistance levels)
-            double resistanceMultiplier = 1 + (resistanceLevel - 1) / 11.0;
+            double resistanceMultiplier = 1 + (resistanceLevel / 11.0);
 
             // Calculate power using the power curve formula
             double power = constant * Math.Pow(speedKmh, exponent) * resistanceMultiplier;
 
-            return (int)power;
+            return (int)Math.Round(power);
         }
     }
 }
